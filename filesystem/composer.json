@@ -1,0 +1,19 @@
+{
+    "name": "meir/fileSystem",
+    "type": "library",
+    "description": "file system",
+    "keywords": ["php","file system"],
+    "homepage": "https://github.com/meirankri/file-system",
+    "license": "",
+    "authors": [
+        {
+            "name": "Ankri Meir",
+            "email": "meirankri@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7"
+    }
+    
+}
