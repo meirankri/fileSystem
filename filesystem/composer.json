@@ -1,19 +1,28 @@
 {
-    "name": "meir/fileSystem",
+    "name": "meirankri/filesystem",
+    "description": "file manager for tinymce",
     "type": "library",
-    "description": "file system",
-    "keywords": ["php","file system"],
-    "homepage": "https://github.com/meirankri/file-system",
-    "license": "",
-    "authors": [
-        {
-            "name": "Ankri Meir",
-            "email": "meirankri@gmail.com",
-            "role": "Developer"
-        }
-    ],
+    "license": "GPL-3.0",
+    "homepage": "https://github.com/meirankri/filesystem",
     "require": {
         "php": ">=7"
+    },
+    "authors": [
+        {
+            "name": "Ankri Meir - Php File manager",
+            "email": "meirankri@gmail.com"
+        }
+    ],
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "https://github.com/meirankri/filesystem"
+      }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+      "files": ["FileSystem.php"]
     }
+
     
 }

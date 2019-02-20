@@ -17,20 +17,43 @@ class FileSystem{
     public function __construct($absolutPath, $relativePath) {
         header ('Content-type: text/html; charset=utf-8');
 
+        $this->set_path($absolutPath,$relativePath) ;
+
+        $this->action();
+
+        $this->set_template() ;
+    }
+
+    public function set_template(){
+        $tpl_vars = [
+            'dirs'=>$this->list_dir(),
+            'files'=> $this->list_file(),
+            'base_url'=>$this->base_uri,
+            'current_dir_url'=>$this->current_dir_uri,
+            'current_dir'=>$this->current_dir,
+            'parent_dir'=>$this->parent_dir
+        ] ;
+
+        foreach ($tpl_vars as $k=>$v){
+            $$k = $v; //$GLOBALS[$k] = $v ;
+        }
+
+        ob_start();
+        require('template.php');
+        $file = ob_get_clean();
+        echo $file ;
+    }
+
+    public function set_path($absolutPath,$relativePath){
         $scheme=isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ?'https':'http';
         $base=rtrim( strtr(dirname($_SERVER['SCRIPT_NAME']),'\\','/') ,'/');
         $uri=parse_url((preg_match('/^\w+:\/\//',$_SERVER['REQUEST_URI'])?'': $scheme.'://'.$_SERVER['SERVER_NAME']).$_SERVER['REQUEST_URI']);
 
         $this->base = $absolutPath ;
-        //$this->base = __DIR__ ;
-
-       //$this->base_uri = $uri['scheme'] .'://'. $uri['host'] . $uri['path'] ;
         $this->base_uri = $uri['scheme'] .'://'.$relativePath.'/';
 
-
-        //set working path
         if (isset($_GET['path']))
-          $this->parent_dir = $_GET['path'] ? $_GET['path'] == '\\' ? '' : dirname($_GET['path']) : '' ;
+            $this->parent_dir = $_GET['path'] ? $_GET['path'] == '\\' ? '' : dirname($_GET['path']) : '' ;
 
         $this->current_dir = isset($_GET['path'] ) ? str_replace($this->base, '', $_GET['path']) : ''  ;
         $this->current_dir_uri = str_replace($this->ds , '/' , $this->current_dir ) ;
@@ -47,7 +70,6 @@ class FileSystem{
             case 'rename' :
                 $this->rename(post('filename'), post('newname'));
                 break ;
-
             case 'paste' :
                 $this->paste($_COOKIE['nameCut']);
                 setcookie("nameCut", "", time()-3600);
@@ -61,12 +83,9 @@ class FileSystem{
             case 'uploadByUrl' :
                 $this->upload_from_url(post('url'));
                 break ;
-
             case 'create_dir' :
                 $this->create_dir(post('dir'));
                 break ;
-
-
         }
     }
 
@@ -77,10 +96,10 @@ class FileSystem{
             $out[] = [ 'name'=> basename($dir)
                 , 'path' => realpath($dir)
                 , 'url' => $this->base_uri . $dir
+                , 'title' => ucfirst(basename($dir))
                 , 'base_path'=> str_replace($this->base,'',realpath($dir))
             ] ;
         }
-       // p($out);
         return $out;
     }
 
@@ -105,7 +124,6 @@ class FileSystem{
                     ] ;
                 }
             }
-            //p($out) ;
         }
         return $out;
     }
