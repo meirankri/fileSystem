@@ -3,7 +3,7 @@ tinymce.PluginManager.add('filesystem', function(editor) {
     editor.settings.file_browser_callback =  function (id, value, type, win) {
         tinymce.activeEditor.windowManager.open({
             title: "file manager",
-            file: tinymce.PluginManager.urls['filesystem'] + '/filesystem?type='+type,
+            file: tinymce.PluginManager.urls['filesystem'] ,
             classes:'filesystem',
             inline: 1
         }
