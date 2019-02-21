@@ -1,5 +1,7 @@
 #File System
 
+V1.4
+
 Simple file system made with php and jquery
 work with two parameters, the first is the absolute path, second is the relative path
 that have to be call with the class 'FileSystem'
