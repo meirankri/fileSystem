@@ -13,15 +13,12 @@
         hr{color: antiquewhite;}
         form{ display: inline-block;}
 
-        .controls{ text-align: center; background-color: #35a4f2; display: flex;
-            padding: 3em 1em 0.4em 1em; justify-content: space-between;  flex-wrap: wrap; }
+        .controls{ text-align: center; background-color: #35a4f2; display: flex;padding: .4em; justify-content: space-between;  flex-wrap: wrap; }
         .controls btn, .controls i{  }
         .btn-create-dir{ left: 2em ;}
-        .breadcrumb{
-            display: flex; justify-content: space-between; border-bottom: #DDD 1px solid; line-height: 3em; padding: 0 2em;}
+        .breadcrumb{display: flex; justify-content: space-between; border-bottom: #DDD 1px solid; line-height: 3em; padding: 0 2em;}
         .breadcrumb i{ font-size: 2em; color: #35a4f2;}
-        .popup .top{height: 3.1em; border-bottom: #DDD 1px solid; line-height: 3em;
-            background-color: #35a4f2;}
+        .popup .top{height: 3.1em; border-bottom: #DDD 1px solid; line-height: 3em;background-color: #35a4f2;}
 
         .form-control{line-height: 3em; height: 3em ;}
 
@@ -32,8 +29,7 @@
         .btn-link:hover{ background: #0d88c1;}
         .btn-action{border: none;color: #FFF;cursor: pointer; }
         .paste{ display: none;}
-        .cut-exists{
-            display: inline-block }
+        .cut-exists{display: inline-block }
         .btn-upload{ background: #449d44;color:#FFF;}
         .btn-create-dir , .btn-link {color:#FFF;}
 
@@ -59,7 +55,6 @@
 
         @font-face {
             font-family: 'fs';
-
             src: url(data:font/truetype;charset=utf-8;base64,<?= base64_encode(file_get_contents(dirname(__FILE__) . "/fs.ttf")) ?>);
             font-weight: normal;
             font-style: normal;
@@ -246,7 +241,6 @@
 
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
-
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -288,17 +282,13 @@
                 return false;
             }
         });
+
         $('.btn-edit').click(function () {
-            function _launch(){
-                console.log($('#aviary_img').data('src'));
-                featherEditor.launch({image: 'aviary_img', url: $('#aviary_img').data('src').replace('///','/')} ) ;
-                return false ;
-            }
-            $('#aviary_img').attr('src',$('#aviary_img').data('src')).load( _launch )  ;
+            featherEditor.launch({image: 'aviary_img', url:$('#aviary_img').attr('src') } ) ;
+            return false ;
         });
 
         $('#link').click(function () {
-
             parent.tinymce.activeEditor.windowManager.getParams().setUrl($('#main').attr('src'));
             parent.tinymce.activeEditor.windowManager.close();
         });
@@ -310,11 +300,12 @@
 
             $('#main').attr('src',_json.url) ;
             $('#file_name').text(_json.name);
-            $('#file-info').text(JSON.stringify(_json)) ;
 
             $('[name="filename"]').val(_json.name);
             $('[name="path"]').val(_json.base_path);
-            $('#aviary_img').data('src', _json.url);
+            $('#aviary_img').attr('src',_json.url).attr('data-savepath',_json.path).data('info',_json).click(function(){
+                console.log($(this).data('info'));
+            });
         });
 
 
@@ -329,7 +320,35 @@
         window.location.href=window.location.href;
     }
 
+    $(document).ready(function() {
+
+        window.featherEditor = new Aviary.Feather({
+            'apiKey'   : 'bd755f388bd04b6398875431a53967b5',
+            'language'  : 'fr',
+            'tools'     :'all',
+            'theme'     : 'light',
+            onSave: function(imageID, newURL) {
+                var img = document.getElementById(imageID);
+                save_path = img.getAttribute('data-savepath') ;
+                img.src = newURL;
+
+                var xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "", true);
+                xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        featherEditor.close();
+                        document.getElementById('main').src = document.getElementById('main').src +'?' + new Date().getTime() ;
+                    }
+                };
+                xhttp.send('action=aviary_save&url=' +encodeURIComponent(newURL) +'&save_path='+encodeURIComponent(save_path));
+                return false;
+            }
+        });
+    }) ;
 
 </script>
+<script src="https://dme0ih8comzn4.cloudfront.net/imaging/v3/editor.js" ></script>
+
 </body>
 </html>

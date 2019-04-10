@@ -49,6 +49,13 @@ class FileSystem{
         $this->base = $absolutPath ;
         $this->base_uri = $relativePath ;
 
+        if (isset($_GET['input']) ){
+            $parts = explode('/',$_GET['input']) ;
+            array_shift($parts);
+            array_pop( $parts);
+            $_GET['path'] = '\\' . implode($parts,'\\')  ;
+        }
+
         if (isset($_GET['path']))
             $this->parent_dir = $_GET['path'] ? $_GET['path'] == '\\' ? '' : dirname($_GET['path']) : '' ;
 
@@ -84,20 +91,12 @@ class FileSystem{
             case 'uploadByUrl' :
                 $this->upload_from_url(post('url'));
                 break ;
+            case 'aviary_save' :
+                $this->aviary_save(post('url'),post('save_path'));
+                die;
+                break;
             case 'create_dir' :
                 $this->create_dir(post('dir'));
-                break ;
-            case 'save_img' :
-                $info = pathinfo(post('name'));
-                if ((strpos($_POST['url'], 'http://s3.amazonaws.com/feather') !== 0 && strpos($_POST['url'], 'https://s3.amazonaws.com/feather') !== 0)
-                    || $_POST['name'] != fix_filename($_POST['name'], $config)
-                    || ! in_array(strtolower($info['extension']), array( 'jpg', 'jpeg', 'png' ))
-                )
-                {
-                    response(trans('wrong data').AddErrorLocation())->send();
-                    exit;
-                }
-                $this->upload_from_url(post('url'));
                 break ;
 
         }
@@ -147,10 +146,10 @@ class FileSystem{
             $filename = $file['name'];
             return pathinfo($filename, PATHINFO_EXTENSION);
         }
-         $mime = explode("/",@mime_content_type($file));
+        $mime = explode("/",@mime_content_type($file));
 
 
-         return end($mime);
+        return end($mime);
     }
 
     public function rename($oldname, $Name) {
@@ -165,20 +164,20 @@ class FileSystem{
 
         if (!file_exists($this->base.'\\'.$path))
             return false;
-            unlink(trim($this->base.'/'.$path));
-            return true;
+        unlink(trim($this->base.'/'.$path));
+        return true;
     }
 
     public function create_dir($name) {
         $name = $this->base . $this->current_dir.$this->ds.$name;
         if (file_exists($name)) return false;
-            return mkdir($name);
+        return mkdir($name);
     }
 
     public function paste($file){
         $src = $this->base.trim($file);
         $dst = $this->base.trim($this->current_dir .$this->ds.basename($src));
-         rename($src, $dst);
+        rename($src, $dst);
     }
 
     public function download($file){
@@ -196,10 +195,8 @@ class FileSystem{
 
     public function upload($file){
         if (in_array(strtolower($this->get_ext($file)), $this->ext)) {
-             $uploadfile = $this->base . $this->ds . $this->current_dir . $this->ds . basename($file['name']);
-                move_uploaded_file($file['tmp_name'], $uploadfile);
-
-
+            $uploadfile = $this->base . $this->ds . $this->current_dir . $this->ds . basename($file['name']);
+            move_uploaded_file($file['tmp_name'], $uploadfile);
         }
 
     }
@@ -213,6 +210,13 @@ class FileSystem{
         $url = end($url);
         $path = $this->base.$this->current_dir.$this->ds.$url;
         file_put_contents($path,$img );
+    }
+
+    public function aviary_save($url,$dst){
+        $img = file_get_contents($url);
+        file_put_contents($dst,$img );
+        echo $url;
+        echo "\n". $dst ;
     }
 
 }
