@@ -283,10 +283,6 @@
             }
         });
 
-        $('.btn-edit').click(function () {
-            featherEditor.launch({image: 'aviary_img', url:$('#aviary_img').attr('src') } ) ;
-            return false ;
-        });
 
         $('#link').click(function () {
             parent.tinymce.activeEditor.windowManager.getParams().setUrl($('#main').attr('src'));
@@ -319,36 +315,8 @@
     function reloaded() {
         window.location.href=window.location.href;
     }
-
-    $(document).ready(function() {
-
-        window.featherEditor = new Aviary.Feather({
-            'apiKey'   : 'bd755f388bd04b6398875431a53967b5',
-            'language'  : 'fr',
-            'tools'     :'all',
-            'theme'     : 'light',
-            onSave: function(imageID, newURL) {
-                var img = document.getElementById(imageID);
-                save_path = img.getAttribute('data-savepath') ;
-                img.src = newURL;
-
-                var xhttp = new XMLHttpRequest();
-                xhttp.open("POST", "", true);
-                xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        featherEditor.close();
-                        document.getElementById('main').src = document.getElementById('main').src +'?' + new Date().getTime() ;
-                    }
-                };
-                xhttp.send('action=aviary_save&url=' +encodeURIComponent(newURL) +'&save_path='+encodeURIComponent(save_path));
-                return false;
-            }
-        });
-    }) ;
-
 </script>
-<script src="https://dme0ih8comzn4.cloudfront.net/imaging/v3/editor.js" ></script>
+
 
 </body>
 </html>
